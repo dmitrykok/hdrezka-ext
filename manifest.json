@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "HDRezka Next Episode Button",
+    "version": "1.0",
+    "description": "Adds a next episode popup button in fullscreen mode on hdrezka.website.",
+    /* "icons": {
+        "16": "icon16.png",
+        "48": "icon48.png",
+        "128": "icon128.png"
+    }, */
+    "content_scripts": [
+        {
+            "matches": [
+                "https://hdrezka.website/*"
+            ],
+            "js": [
+                "next_button.js"
+            ],
+            "css": [
+                "next_button.css"
+            ]
+        }
+    ],
+    "permissions": []
+}
