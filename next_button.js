@@ -5,75 +5,100 @@
 
   let nextButton;
 
-  // Function to create the Next Episode button
-function createNextButton() {
-  console.log('Creating Next Episode button...');
-  nextButton = document.createElement('pjsdiv');
-  nextButton.id = 'next-episode-button';
-  nextButton.innerText = 'Next Episode';
-  nextButton.addEventListener('click', navigateToNextEpisode);
-
-  const playerElement = document.getElementById('oframecdnplayer');
-  if (playerElement) {
-    playerElement.appendChild(nextButton);
-  } else {
-    console.error('Player element not found.');
+  function setNextButtonText() {
+    const nextEpisode = getNextEpisodeElement();
+    nextButton.innerText = getNextButtonText(nextEpisode);
   }
 
-  // Function to apply styles when elements are available
-  function applyStyles() {
-    const controlTimelineElement = document.getElementById('cdnplayer_control_timeline');
-    if (controlTimelineElement) {
-      // Get all descendant pjsdiv elements
-      const descendants = controlTimelineElement.getElementsByTagName('pjsdiv');
-      // Get the background color from the first child pjsdiv
-      // const firstChild = controlTimelineElement.querySelector('pjsdiv[style*="background-color"]');
-      const firstChild = descendants[0]
-      let backgroundColor = 'rgb(23, 35, 34)'; // Default value
-      if (firstChild) {
-        const firstChildStyles = getComputedStyle(firstChild);
-        backgroundColor = firstChildStyles.backgroundColor || backgroundColor;
-      } else {
-        console.warn('First child with background-color not found. Using default color.');
-      }
-      nextButton.style.backgroundColor = backgroundColor;
-      nextButton.style.color = '#fff'; // Ensure text is visible
+  function getNextButtonText(nextEpisode) {
+    season_id = null;
+    episode_id = null;
+      
+    if (
+      nextEpisode &&
+      nextEpisode.hasAttribute('data-season_id') &&
+      nextEpisode.hasAttribute('data-episode_id')
+    ) {
+      season_id = nextEpisode.getAttribute('data-season_id');
+      episode_id = nextEpisode.getAttribute('data-episode_id');
+    }
 
-      // Get the hover background color from the pjsdiv with background rgb(0, 173, 239)
-      // const hoverElement = controlTimelineElement.querySelector('pjsdiv[style*="background: rgb(0, 173, 239)"]');
-      const hoverElement = descendants[4]
-      if (hoverElement) {
-        const hoverStyles = getComputedStyle(hoverElement);
-        const hoverBackgroundColor = hoverStyles.backgroundColor || 'rgb(0, 173, 239)';
-
-        // Set up hover events
-        nextButton.addEventListener('mouseenter', function() {
-          nextButton.style.backgroundColor = hoverBackgroundColor;
-        });
-        nextButton.addEventListener('mouseleave', function() {
-          nextButton.style.backgroundColor = backgroundColor;
-        });
-      } else {
-        console.warn('Hover element with background rgb(0, 173, 239) not found. Hover effect will not be applied.');
-      }
-
-      // Clear the interval once styles are applied
-      clearInterval(styleInterval);
+    if (season_id && episode_id) {
+      return `Next Episode: S${ season_id }:E${ episode_id }`;
     } else {
-      console.warn('Control timeline element not found yet. Retrying...');
+      return 'No Next Episode';
     }
   }
 
-  // Attempt to apply styles every 500ms until successful
-  const styleInterval = setInterval(applyStyles, 500);
+  // Function to create the Next Episode button
+  function createNextButton() {
+    console.log('Creating Next Episode button...');
 
-  // Start monitoring the control timeline visibility
-  monitorControlTimelineVisibility();
-}
+    nextButton = document.createElement('pjsdiv');
+    nextButton.id = 'next-episode-button';
+    setNextButtonText();
+    nextButton.addEventListener('click', navigateToNextEpisode);
 
-  // Function to navigate to the next episode
-  function navigateToNextEpisode() {
-    console.log('Navigating to the next episode...');
+    const playerElement = document.getElementById('oframecdnplayer');
+    if (playerElement) {
+      playerElement.appendChild(nextButton);
+    } else {
+      console.error('Player element not found.');
+    }
+
+    // Function to apply styles when elements are available
+    function applyStyles() {
+      const controlTimelineElement = document.getElementById('cdnplayer_control_timeline');
+      if (controlTimelineElement) {
+        // Get all descendant pjsdiv elements
+        const descendants = controlTimelineElement.getElementsByTagName('pjsdiv');
+        // Get the background color from the first child pjsdiv
+        // const firstChild = controlTimelineElement.querySelector('pjsdiv[style*="background-color"]');
+        const firstChild = descendants[0]
+        let backgroundColor = 'rgb(23, 35, 34)'; // Default value
+        if (firstChild) {
+          const firstChildStyles = getComputedStyle(firstChild);
+          backgroundColor = firstChildStyles.backgroundColor || backgroundColor;
+        } else {
+          console.warn('First child with background-color not found. Using default color.');
+        }
+        nextButton.style.backgroundColor = backgroundColor;
+        nextButton.style.color = '#fff'; // Ensure text is visible
+
+        // Get the hover background color from the pjsdiv with background rgb(0, 173, 239)
+        // const hoverElement = controlTimelineElement.querySelector('pjsdiv[style*="background: rgb(0, 173, 239)"]');
+        const hoverElement = descendants[4]
+        if (hoverElement) {
+          const hoverStyles = getComputedStyle(hoverElement);
+          const hoverBackgroundColor = hoverStyles.backgroundColor || 'rgb(0, 173, 239)';
+
+          // Set up hover events
+          nextButton.addEventListener('mouseenter', function() {
+            nextButton.style.backgroundColor = hoverBackgroundColor;
+          });
+          nextButton.addEventListener('mouseleave', function() {
+            nextButton.style.backgroundColor = backgroundColor;
+          });
+        } else {
+          console.warn('Hover element with background rgb(0, 173, 239) not found. Hover effect will not be applied.');
+        }
+
+        // Clear the interval once styles are applied
+        clearInterval(styleInterval);
+      } else {
+        console.warn('Control timeline element not found yet. Retrying...');
+      }
+    }
+
+    // Attempt to apply styles every 500ms until successful
+    const styleInterval = setInterval(applyStyles, 500);
+
+    // Start monitoring the control timeline visibility
+    monitorControlTimelineVisibility();
+  }
+
+  function getNextEpisodeElement(){ 
+    console.log('Get next episode element...');
     
     // Find the currently active episode
     const activeEpisode = document.querySelector('.b-simple_episode__item.active');
@@ -99,13 +124,30 @@ function createNextButton() {
       
       if (nextEpisode && nextEpisode.classList.contains('b-simple_episode__item')) {
         // Simulate a click on the next episode
-        nextEpisode.click();
-        console.log('Next episode clicked.');
+        console.log('Next episode element found.');
+        return nextEpisode;
       } else {
-        alert('This is the last episode.');
+        console.log('This is the last episode.');
       }
     } else {
-      alert('Active episode not found.');
+      console.log('Active episode not found.');
+    }
+    return null;
+  }
+
+  // Function to navigate to the next episode
+  function navigateToNextEpisode() {
+    console.log('Navigating to the next episode...');
+    
+    const nextEpisode = getNextEpisodeElement();
+      
+    if (nextEpisode && nextEpisode.classList.contains('b-simple_episode__item')) {
+      // Simulate a click on the next episode
+      nextEpisode.click();
+      setTimeout(setNextButtonText, 1000);
+      console.log('Next episode clicked.');
+    } else {
+      console.log('This is the last episode.');
     }
   }
 
@@ -120,12 +162,19 @@ function createNextButton() {
     }
 
     // Function to update the visibility of the Next Episode button
-    function updateNextButtonVisibility() {
+    function updateNextButtonVisibility()
+    {
+      const isFullscreen = !!(
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      );
       const computedStyle = getComputedStyle(controlTimelineElement);
       const visibility = computedStyle.visibility;
       console.log('Control timeline visibility style:', visibility);
       if (visibility === 'visible') {
-        nextButton.style.display = 'block';
+        if (isFullscreen) nextButton.style.display = 'block';
       } else if (visibility === 'hidden') {
         nextButton.style.display = 'none';
       } else {
@@ -166,6 +215,7 @@ function createNextButton() {
     if (isFullscreen) {
       if (!nextButton) createNextButton();
       // The visibility is now managed by the control timeline visibility
+      setNextButtonText();
     } else {
       if (nextButton) nextButton.style.display = 'none';
     }
