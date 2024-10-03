@@ -22,12 +22,16 @@
                 "*://*.hdrezka.ink/*"
             ],
             "js": [
-                "next_button.js"
+                "next_button.js",
+                "stop_cast.js"
             ],
             "css": [
-                "next_button.css"
+                "next_button.css",
+                "stop_cast.css"
             ]
         }
     ],
-    "permissions": []
+    "permissions": [
+        "activeTab"
+    ]
 }

@@ -4,6 +4,7 @@
   console.log('Content script loaded');
 
   let nextButton;
+  let stopCastButton;
 
   /**
    * Sets the text of the next button based on the next episode.
