@@ -5,15 +5,28 @@
 
   let nextButton;
 
+  /**
+   * Sets the text of the next button based on the next episode.
+   * If there is a next episode, the button text is set to
+   * "Next Episode: S<season_id>:E<episode_id>" otherwise it is set to "No Next Episode".
+   */
   function setNextButtonText() {
     const nextEpisode = getNextEpisodeElement();
     nextButton.innerText = getNextButtonText(nextEpisode);
   }
 
+  /**
+   * Returns a string representing the next episode in the following format:
+   * "Next Episode: S<season_id>:E<episode_id>" or "No Next Episode" if there is no
+   * next episode.
+   *
+   * @param {Element} nextEpisode - The next episode element.
+   * @return {string} The text for the Next Episode button.
+   */
   function getNextButtonText(nextEpisode) {
     season_id = null;
     episode_id = null;
-      
+
     if (
       nextEpisode &&
       nextEpisode.hasAttribute('data-season_id') &&
@@ -30,7 +43,16 @@
     }
   }
 
-  // Function to create the Next Episode button
+  /**
+   * Creates the Next Episode button and appends it to the player element.
+   * The button is created with the text from the next episode, and a
+   * click event is added to navigate to the next episode.
+   * The style of the button is set to match the control timeline's
+   * background color, and a hover effect is applied to change the
+   * background color to rgb(0, 173, 239) when the mouse is over the button.
+   * If the control timeline element is not found, the function will
+   * retry every 500ms until it is found.
+   */
   function createNextButton() {
     console.log('Creating Next Episode button...');
 
@@ -46,7 +68,12 @@
       console.error('Player element not found.');
     }
 
-    // Function to apply styles when elements are available
+    /**
+    * Applies the styles to the Next Episode button to match the control timeline's
+    * background color and adds a hover effect to change the background color to
+    * rgb(0, 173, 239) when the mouse is over the button. If the control timeline element
+    * is not found, the function will retry every 500ms until it is found.
+    */
     function applyStyles() {
       const controlTimelineElement = document.getElementById('cdnplayer_control_timeline');
       if (controlTimelineElement) {
@@ -97,31 +124,39 @@
     monitorControlTimelineVisibility();
   }
 
+  /**
+  * Returns the next episode element after the currently active episode.
+  * If there is no next episode in the same season, it will check if there is a next season
+  * and make it visible. If there is a next season, it will return the first episode of that season.
+  * If there is no next episode or no next season, it will return null.
+  *
+  * @return {Element} The next episode element or null.
+  */
   function getNextEpisodeElement(){ 
     console.log('Get next episode element...');
-    
+
     // Find the currently active episode
     const activeEpisode = document.querySelector('.b-simple_episode__item.active');
-    
+
     if (activeEpisode) {
       let nextEpisode = activeEpisode.nextElementSibling;
-      
+
       if (!nextEpisode) {
         // No next sibling, check if there is a next season
         const currentSeasonList = activeEpisode.parentElement;
         const nextSeasonList = currentSeasonList.nextElementSibling;
-        
+
         if (nextSeasonList && nextSeasonList.classList.contains('b-simple_episodes__list')) {
           // Make the next season's episode list visible
           nextSeasonList.style.display = 'block';
           // Hide the current season's episode list
           currentSeasonList.style.display = 'none';
-          
+
           // Get the first episode of the next season
           nextEpisode = nextSeasonList.querySelector('.b-simple_episode__item');
         }
       }
-      
+
       if (nextEpisode && nextEpisode.classList.contains('b-simple_episode__item')) {
         // Simulate a click on the next episode
         console.log('Next episode element found.');
@@ -135,12 +170,16 @@
     return null;
   }
 
-  // Function to navigate to the next episode
+  /**
+   * Navigates to the next episode by simulating a click on the next episode element.
+   * If there is no next episode, it will log a message to the console.
+   * It also updates the next episode button text 1 second after navigation.
+   */
   function navigateToNextEpisode() {
     console.log('Navigating to the next episode...');
-    
+
     const nextEpisode = getNextEpisodeElement();
-      
+
     if (nextEpisode && nextEpisode.classList.contains('b-simple_episode__item')) {
       // Simulate a click on the next episode
       nextEpisode.click();
@@ -151,17 +190,32 @@
     }
   }
 
-  // Function to monitor the visibility of the control timeline
+  /**
+  * Monitors the control timeline element for changes to its visibility style
+  * and updates the Next Episode button's display style accordingly.
+  * If the control timeline is visible, the Next Episode button will be displayed
+  * in fullscreen mode. If the control timeline is hidden, the Next Episode button
+  * will be hidden.
+  * A MutationObserver is created to monitor changes to the control timeline element's
+  * style attribute, and the Next Episode button's display style is updated accordingly.
+  */
   function monitorControlTimelineVisibility() {
     // Get the control timeline element
     const controlTimelineElement = document.getElementById('cdnplayer_control_timeline');
-    
+
     if (!controlTimelineElement) {
       console.error('Control timeline element not found.');
       return;
     }
 
-    // Function to update the visibility of the Next Episode button
+    /**
+     * Updates the Next Episode button's display style based on the control timeline
+     * element's visibility style. If the control timeline is visible and the
+     * document is in fullscreen mode, the Next Episode button will be displayed.
+     * Otherwise, the button will be hidden.
+     * @param {Element} controlTimelineElement The control timeline element
+     * @param {Element} nextButton The Next Episode button element
+     */
     function updateNextButtonVisibility()
     {
       const isFullscreen = !!(
@@ -202,7 +256,12 @@
     updateNextButtonVisibility();
   }
 
-  // Function to check fullscreen mode
+  /**
+  * Checks the current fullscreen status of the document and updates the Next
+  * Episode button visibility accordingly. If the document is in fullscreen mode,
+  * the Next Episode button will be displayed. Otherwise, the button will be hidden.
+  * @function checkFullscreen
+  */
   function checkFullscreen() {
     console.log('Checking fullscreen status...');
     const isFullscreen = !!(
