@@ -6,23 +6,70 @@
   let nextButton;
 
   // Function to create the Next Episode button
-  function createNextButton() {
-    console.log('Creating Next Episode button...');
-    nextButton = document.createElement('div');
-    nextButton.id = 'next-episode-button';
-    nextButton.innerText = 'Next Episode';
-    nextButton.addEventListener('click', navigateToNextEpisode);
+function createNextButton() {
+  console.log('Creating Next Episode button...');
+  nextButton = document.createElement('pjsdiv');
+  nextButton.id = 'next-episode-button';
+  nextButton.innerText = 'Next Episode';
+  nextButton.addEventListener('click', navigateToNextEpisode);
 
-    const playerElement = document.getElementById('oframecdnplayer');
-    if (playerElement) {
-      playerElement.appendChild(nextButton);
-    } else {
-      console.error('Player element not found.');
-    }
-
-    // Start monitoring the control timeline visibility
-    monitorControlTimelineVisibility();
+  const playerElement = document.getElementById('oframecdnplayer');
+  if (playerElement) {
+    playerElement.appendChild(nextButton);
+  } else {
+    console.error('Player element not found.');
   }
+
+  // Function to apply styles when elements are available
+  function applyStyles() {
+    const controlTimelineElement = document.getElementById('cdnplayer_control_timeline');
+    if (controlTimelineElement) {
+      // Get all descendant pjsdiv elements
+      const descendants = controlTimelineElement.getElementsByTagName('pjsdiv');
+      // Get the background color from the first child pjsdiv
+      // const firstChild = controlTimelineElement.querySelector('pjsdiv[style*="background-color"]');
+      const firstChild = descendants[0]
+      let backgroundColor = 'rgb(23, 35, 34)'; // Default value
+      if (firstChild) {
+        const firstChildStyles = getComputedStyle(firstChild);
+        backgroundColor = firstChildStyles.backgroundColor || backgroundColor;
+      } else {
+        console.warn('First child with background-color not found. Using default color.');
+      }
+      nextButton.style.backgroundColor = backgroundColor;
+      nextButton.style.color = '#fff'; // Ensure text is visible
+
+      // Get the hover background color from the pjsdiv with background rgb(0, 173, 239)
+      // const hoverElement = controlTimelineElement.querySelector('pjsdiv[style*="background: rgb(0, 173, 239)"]');
+      const hoverElement = descendants[4]
+      if (hoverElement) {
+        const hoverStyles = getComputedStyle(hoverElement);
+        const hoverBackgroundColor = hoverStyles.backgroundColor || 'rgb(0, 173, 239)';
+
+        // Set up hover events
+        nextButton.addEventListener('mouseenter', function() {
+          nextButton.style.backgroundColor = hoverBackgroundColor;
+        });
+        nextButton.addEventListener('mouseleave', function() {
+          nextButton.style.backgroundColor = backgroundColor;
+        });
+      } else {
+        console.warn('Hover element with background rgb(0, 173, 239) not found. Hover effect will not be applied.');
+      }
+
+      // Clear the interval once styles are applied
+      clearInterval(styleInterval);
+    } else {
+      console.warn('Control timeline element not found yet. Retrying...');
+    }
+  }
+
+  // Attempt to apply styles every 500ms until successful
+  const styleInterval = setInterval(applyStyles, 500);
+
+  // Start monitoring the control timeline visibility
+  monitorControlTimelineVisibility();
+}
 
   // Function to navigate to the next episode
   function navigateToNextEpisode() {
@@ -74,7 +121,8 @@
 
     // Function to update the visibility of the Next Episode button
     function updateNextButtonVisibility() {
-      const visibility = controlTimelineElement.style.visibility;
+      const computedStyle = getComputedStyle(controlTimelineElement);
+      const visibility = computedStyle.visibility;
       console.log('Control timeline visibility style:', visibility);
       if (visibility === 'visible') {
         nextButton.style.display = 'block';
@@ -98,7 +146,7 @@
     // Start observing the control timeline element
     observer.observe(controlTimelineElement, {
       attributes: true, // Watch for attribute changes
-      attributeFilter: ['style'] // Only watch the 'style' attribute
+      attributeFilter: ['style', 'class'] // Only watch the 'style' attribute
     });
 
     // Initial check

@@ -7,10 +7,8 @@
     /* background-color: rgb(23, 35, 34); */
     color: #fff;
     padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
     z-index: 2147483647;
-    display: none;
+    display: block;
     font-size: 16px;
     border-radius: 2.3px;
     background: rgb(23, 35, 34);
@@ -22,5 +20,5 @@
 }
 
 #next-episode-button:hover {
-    background-color: rgb(29, 174, 236);
+    background-color: rgb(0, 173, 239);
 }
