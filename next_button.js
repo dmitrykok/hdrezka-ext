@@ -125,6 +125,24 @@
     monitorControlTimelineVisibility();
   }
 
+/**
+ * Simulates a click on the start button to start the next episode.
+ * Retrieves the element using the following DOM traversal:
+ * 1. Get the oframecdnplayer element
+ * 2. Get the 8th child node (index 7)
+ * 3. Get the first child of the 8th node
+ * 4. Get the first child of the first child (the start button)
+ * 5. Simulate a click on the start button
+ */
+function startNextEpisode() {
+  const oframecdnplayer = document.getElementById('oframecdnplayer');
+  const descendants = oframecdnplayer.childNodes;
+  const startButton = descendants[7].firstChild.firstChild;
+  console.log('Start Next Episode...');
+  startButton.click();
+}
+
+
   /**
   * Returns the next episode element after the currently active episode.
   * If there is no next episode in the same season, it will check if there is a next season
@@ -133,7 +151,7 @@
   *
   * @return {Element} The next episode element or null.
   */
-  function getNextEpisodeElement(){ 
+  function getNextEpisodeElement(){
     console.log('Get next episode element...');
 
     // Find the currently active episode
@@ -173,8 +191,8 @@
 
   /**
    * Navigates to the next episode by simulating a click on the next episode element.
-   * If there is no next episode, it will log a message to the console.
-   * It also updates the next episode button text 1 second after navigation.
+   * If there is no next episode, the function does nothing.
+   * @function navigateToNextEpisode
    */
   function navigateToNextEpisode() {
     console.log('Navigating to the next episode...');
@@ -184,7 +202,8 @@
     if (nextEpisode && nextEpisode.classList.contains('b-simple_episode__item')) {
       // Simulate a click on the next episode
       nextEpisode.click();
-      setTimeout(setNextButtonText, 1000);
+      setTimeout(setNextButtonText, 2000);
+      setTimeout(startNextEpisode, 2000);
       console.log('Next episode clicked.');
     } else {
       console.log('This is the last episode.');
