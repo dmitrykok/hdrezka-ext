@@ -8,7 +8,14 @@
 
   // Existing code for Next Episode button...
 
-  // Function to create the Stop Casting button
+  /**
+   * Creates the Stop Casting button and appends it to the player element.
+   * The button is created with the text "Stop Casting" and a click event is
+   * added to call the stopCasting function to stop the casting session.
+   * If the player element is not found, the function will retry every 500ms
+   * until it is found. Finally, the function starts monitoring the cast button
+   * by calling the monitorCastButton function.
+   */
   function createStopCastButton() {
     console.log('Creating Stop Casting button...');
     stopCastButton = document.createElement('pjsdiv');
@@ -27,7 +34,11 @@
     monitorCastButton();
   }
 
-  // Function to simulate click on the cast button to stop casting
+  /**
+   * Stops the current casting session by simulating a click on the Cast button
+   * and its parent element.
+   * @return {void}
+   */
   function stopCasting() {
     console.log('Stopping casting session...');
       const castButton = document.getElementById('pjs_cast_button_cdnplayer');
@@ -44,7 +55,16 @@
     }
   }
 
-  // Function to monitor the cast button for casting status
+  /**
+   * Monitors the cast button for changes to its casting status by checking the
+   * class names of its path elements. When casting starts or stops, the function
+   * calls the checkCastingStatus function to update the isCasting variable and
+   * hide or show the Stop Casting button accordingly.
+   * A MutationObserver is used to monitor changes to the path elements' class
+   * names, and the checkCastingStatus function is called whenever a change is
+   * detected.
+   * @return {void}
+   */
   function monitorCastButton() {
     const castButton = document.getElementById('pjs_cast_button_cdnplayer');
     if (!castButton) {
@@ -64,7 +84,15 @@
       return;
     }
 
-    // Function to check casting status based on class names
+    /**
+    * Checks the casting status by examining the class names of path elements
+    * within the cast button's SVG element. If any path element contains the
+    * 'cast_caf_state_c' class, it indicates that casting is active.
+    * Updates the `isCasting` variable and the display of the Stop Casting button
+    * based on whether casting has started or stopped. If casting starts and the
+    * Stop Casting button is not already created, it creates the button and makes
+    * it visible. If casting stops, it hides the Stop Casting button.
+    */
     function checkCastingStatus() {
       let castingActive = false;
       pathElements.forEach(path => {
