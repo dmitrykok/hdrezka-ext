@@ -68,7 +68,7 @@
   function monitorCastButton() {
     const castButton = document.getElementById('pjs_cast_button_cdnplayer');
     if (!castButton) {
-      console.error('Cast button not found.');
+      console.warn('Cast button not found.');
       return;
     }
 
