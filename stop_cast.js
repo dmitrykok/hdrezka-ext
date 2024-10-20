@@ -1,4 +1,9 @@
-// content.js
+/**
+ * Manages the Stop Casting button functionality for a video player.
+ * This script creates a "Stop Casting" button and appends it to the player element.
+ * It also monitors the cast button for changes in casting status and updates the
+ * visibility of the Stop Casting button accordingly.
+ */
 
 (function() {
   console.log('Content script loaded');
