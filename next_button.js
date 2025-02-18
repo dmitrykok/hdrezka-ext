@@ -222,11 +222,14 @@ function startNextEpisode() {
   function monitorControlTimelineVisibility() {
     // Get the control timeline element
     const controlTimelineElement = document.getElementById('cdnplayer_control_timeline');
+    const cdnplayerSettings = document.getElementById('cdnplayer_settings');
 
-    if (!controlTimelineElement) {
-      console.error('Control timeline element not found.');
+    if (!controlTimelineElement || !cdnplayerSettings) {
+      console.error('Control timeline element or cdnplayer_settings element not found.');
       return;
     }
+
+    const cdnplayerSettingsParent = cdnplayerSettings.parentElement;
 
     /**
      * Updates the Next Episode button's display style based on the control timeline
@@ -234,6 +237,7 @@ function startNextEpisode() {
      * document is in fullscreen mode, the Next Episode button will be displayed.
      * Otherwise, the button will be hidden.
      * @param {Element} controlTimelineElement The control timeline element
+     * @param {Element} cdnplayerSettingsParent The control cdnplayer settings element
      * @param {Element} nextButton The Next Episode button element
      */
     function updateNextButtonVisibility()
@@ -244,13 +248,18 @@ function startNextEpisode() {
         document.mozFullScreenElement ||
         document.msFullscreenElement
       );
+      const cdnplayerSettingsStyle = getComputedStyle(cdnplayerSettingsParent);
+      const cdnplayerSettingsVisability = cdnplayerSettingsStyle.visibility;
       const computedStyle = getComputedStyle(controlTimelineElement);
       const visibility = computedStyle.visibility;
+      console.log('Cdnplayer settings visibility style:', cdnplayerSettingsVisability);
       console.log('Control timeline visibility style:', visibility);
-      if (visibility === 'visible') {
-        if (isFullscreen) nextButton.style.display = 'block';
-      } else if (visibility === 'hidden') {
-        nextButton.style.display = 'none';
+      if (
+        visibility === "visible" &&
+        cdnplayerSettingsVisability === "hidden" &&
+        isFullscreen
+      ) {
+        nextButton.style.display = 'block';
       } else {
         // Default case if visibility is not set
         nextButton.style.display = 'none';
@@ -258,7 +267,15 @@ function startNextEpisode() {
     }
 
     // Create a MutationObserver to monitor changes
-    const observer = new MutationObserver(function(mutations) {
+    const observer1 = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          updateNextButtonVisibility();
+        }
+      });
+    });
+
+    const observer2 = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
         if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
           updateNextButtonVisibility();
@@ -267,7 +284,12 @@ function startNextEpisode() {
     });
 
     // Start observing the control timeline element
-    observer.observe(controlTimelineElement, {
+    observer1.observe(controlTimelineElement, {
+      attributes: true, // Watch for attribute changes
+      attributeFilter: ['style', 'class'] // Only watch the 'style' attribute
+    });
+
+    observer2.observe(cdnplayerSettingsParent, {
       attributes: true, // Watch for attribute changes
       attributeFilter: ['style', 'class'] // Only watch the 'style' attribute
     });
