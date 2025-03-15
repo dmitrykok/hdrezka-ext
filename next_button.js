@@ -4,7 +4,57 @@
   console.log('Content script loaded');
 
   let nextButton;
-  let stopCastButton;
+  const observedEpisodes = new WeakSet();
+
+  /**
+  * Attaches a MutationObserver to an episode element to monitor changes in its class attribute.
+  * The observer watches for the removal of the "active" class. When the "active" class is
+  * removed, it disconnects the observer, logs the change, and attempts to find and attach
+  * the observer to a new active episode element if one is found.
+  *
+  * @param {Element} episode - The episode element to which the observer is attached.
+  */
+  function attachObserverToActive() {
+    const activeEpisode = document.querySelector('.b-simple_episode__item.active');
+    // Check if the observer is already attached to this element.
+    if (observedEpisodes.has(activeEpisode)) {
+      return; // Skip if already observing.
+    }
+    // Mark this element as being observed.
+    observedEpisodes.add(activeEpisode);
+
+    // Create a MutationObserver for the active element.
+    const observer = new MutationObserver((mutations, obs) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          // When the "active" class is removed, disconnect the observer.
+          if (!activeEpisode.classList.contains('active')) {
+            console.log('Active class removed from element:', activeEpisode);
+            // Remove the element from the WeakSet so we can reattach if needed.
+            observedEpisodes.delete(activeEpisode);
+            obs.disconnect();
+
+            // Find the new active activeEpisode.
+            const newActiveEpisode = document.querySelector('.b-simple_episode__item.active');
+            if (newActiveEpisode) {
+              console.log('New active element found:', newActiveEpisode);
+              // Attach the observer to the new active element.
+              // attachObserverToActive(newActiveEpisode);
+              setTimeout(setNextButtonText, 2000);
+            } else {
+              console.warn('No new active element found.');
+            }
+          }
+        }
+      });
+    });
+
+    // Observe changes to the "class" attribute.
+    observer.observe(activeEpisode, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+  }
 
   /**
    * Sets the text of the next button based on the next episode.
@@ -14,6 +64,7 @@
   function setNextButtonText() {
     const nextEpisode = getNextEpisodeElement();
     nextButton.innerText = getNextButtonText(nextEpisode);
+    attachObserverToActive();
   }
 
   /**
@@ -163,7 +214,7 @@ function startNextEpisode() {
       if (!nextEpisode) {
         // No next sibling, check if there is a next season
         const currentSeasonList = activeEpisode.parentElement;
-        const nextSeasonList = currentSeasonList.nextElementSibling;
+        const nextSeasx1onList = currentSeasonList.nextElementSibling;
 
         if (nextSeasonList && nextSeasonList.classList.contains('b-simple_episodes__list')) {
           // Make the next season's episode list visible
