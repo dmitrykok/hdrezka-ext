@@ -214,7 +214,7 @@ function startNextEpisode() {
       if (!nextEpisode) {
         // No next sibling, check if there is a next season
         const currentSeasonList = activeEpisode.parentElement;
-        const nextSeasx1onList = currentSeasonList.nextElementSibling;
+        const nextSeasonList = currentSeasonList.nextElementSibling;
 
         if (nextSeasonList && nextSeasonList.classList.contains('b-simple_episodes__list')) {
           // Make the next season's episode list visible
